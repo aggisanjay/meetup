@@ -183,8 +183,8 @@ All protected routes require an `Authorization: Bearer <token>` header (Clerk se
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| `GET` | `/` | ❌ | Health check |
-| `POST` | `/api/clerk` | ❌ | Clerk webhook receiver |
+| `GET` | `/` |✅ | Health check |
+| `POST` | `/api/clerk` |✅  | Clerk webhook receiver |
 | `POST` | `/api/meetings` | ✅ | Create a new meeting |
 | `GET` | `/api/meetings/stats` | ✅ | Get user's plan & meeting stats |
 | `GET` | `/api/meetings/sessions` | ✅ | Get all user's meeting sessions |
