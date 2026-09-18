@@ -11,7 +11,7 @@ const ProtectedRoute = () => {
   }
 
   if(!isSignedIn){
-    return <Navigate to="/login" replace />
+    return <Navigate to="/" replace />
   }
 
   return <Outlet />

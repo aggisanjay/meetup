@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard'
 import Sessions from './pages/Sessions'
 import Pricing from './pages/Pricing'
 import MeetingRoom from './pages/MeetingRoom'
+import Landing from './pages/Landing'
 
 const App = () => {
   return (
@@ -15,6 +16,7 @@ const App = () => {
       <Toaster />
       <Routes>
         {/* Public Routes */}
+        <Route path='/' element={ <Landing /> }/>
         <Route path='/login' element={ <Login mode="login"/>}/>
         <Route path='/register' element={ <Login mode="register"/>}/>
 
@@ -29,7 +31,7 @@ const App = () => {
         </Route>
 
         {/* other Routes */}
-      <Route path='*' element={ <Navigate to='/dashboard' replace/> }/>
+        <Route path='*' element={ <Navigate to='/' replace/> }/>
       </Routes>
     </>
   )

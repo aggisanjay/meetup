@@ -1,7 +1,7 @@
 import React from 'react'
 import { dummyUser } from '../assets/asset'
 import { Link, useLocation } from 'react-router-dom'
-import { AstroidIcon, HistoryIcon, LayoutDashboardIcon } from 'lucide-react'
+import { AstroidIcon, HistoryIcon, LayoutDashboardIcon, Sparkles } from 'lucide-react'
 import { UserButton, useUser } from '@clerk/react'
 
 const Navbar = () => {
@@ -13,7 +13,7 @@ const Navbar = () => {
    <header className="w-full max-w-305 mx-auto bg-white/90 backdrop-blur xl:rounded-b-xl sticky top-0 z-40 px-6 py-4 flex items-center justify-between border border-slate-200">
     {/* Brand Logo & Navigation Links */}
     <div className='flex items-center gap-6'>
-        <Link to='/dashboard' className='flex items-center gap-1.5'>
+        <Link to='/' className='flex items-center gap-1.5'>
         <img src="/logo.svg" alt="MeetUp Logo" className="size-6.5"/>
         <span className='text-2xl font-medium tracking-tight text-slate-900 flex items-center'>
             MeetUp<span className="text-primary">.</span>
@@ -23,6 +23,16 @@ const Navbar = () => {
 
         {isSignedIn && (
             <nav className="hidden md:flex items-center gap-1.5 ml-2">
+                <Link to="/" 
+                className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 ${
+                    location.pathname === '/' 
+                    ? "ring ring-blue-100 bg-blue-50 text-slate-800"
+                    : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
+                }`}>
+                    <Sparkles className="w-3.5 h-3.5 text-blue-500"/>
+                    Overview
+                </Link>
+
                 <Link to="/dashboard" 
                 className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 ${
                     location.pathname === '/dashboard' 
