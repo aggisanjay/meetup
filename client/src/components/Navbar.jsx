@@ -1,5 +1,4 @@
 import React from 'react'
-import { dummyUser } from '../assets/asset'
 import { Link, useLocation } from 'react-router-dom'
 import { AstroidIcon, HistoryIcon, LayoutDashboardIcon, Sparkles } from 'lucide-react'
 import { UserButton, useUser } from '@clerk/react'

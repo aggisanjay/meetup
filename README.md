@@ -1,24 +1,35 @@
-# 🎥 MeetUp — Video Conferencing App
+# 🎥 MeetUp — Real-Time Collaborative Meeting & Workspace Platform
 
-A full-stack, real-time video conferencing application built with **React**, **Express**, **WebRTC**, and **Socket.IO**. Features peer-to-peer video/audio calls, in-meeting chat, session history, and a subscription-based pricing model powered by **Clerk** and **Stripe**.
+MeetUp is a full-stack, production-oriented video meeting and real-time collaboration application. Built with **React 19**, **Express 5**, **WebRTC**, **Socket.IO**, **Yjs (CRDTs)**, **Clerk Authentication**, and **Neon PostgreSQL**.
+
+Beyond peer-to-peer video/audio calls and chat, MeetUp features an in-meeting collaborative workspace with **Shared Notes**, an **Interactive Whiteboard**, and a **Collaborative Code Editor** with live cursors, role-based permissions (Host, Editor, Viewer), durable snapshot persistence, version history restoration, and offline conflict-free merging.
 
 ---
 
 ## ✨ Features
 
-- **Instant Meetings** — Create a meeting with one click and share the unique meeting code
-- **Join via Code** — Enter a meeting code (e.g., `abc-def-ghi`) to join any active meeting
-- **Peer-to-Peer Video & Audio** — WebRTC-powered, low-latency video calls with direct peer connections
-- **Audio/Video Controls** — Toggle microphone and camera on/off during meetings
-- **In-Meeting Chat** — Real-time text chat persisted to the database
-- **Participant List** — View all participants currently in the meeting
-- **Session History** — Browse past meetings with participants and chat transcripts
-- **Authentication** — Clerk-powered sign-in/sign-up with email and Google OAuth
-- **Pricing & Plans** — Free and Premium tiers with Clerk's built-in `<PricingTable />`
-  - **Free**: 30 meetings/month, up to 10 participants
-  - **Premium**: Unlimited meetings, up to 100 participants
-- **Webhook Sync** — Clerk webhooks keep the database in sync with user events
-- **Auto-Provisioning** — Users missing from the database (e.g., webhook failure) are auto-created on first request
+### 🤝 Collaborative Workspace
+- **Shared Rich-Text Notes** — Collaborative markdown/rich-text document with formatting tools (Headings, Lists, Tasks, Code blocks, Quotes), word/character counters, live preview, and `.md` export.
+- **Shared Whiteboard / Canvas** — High-performance vector drawing board with freehand pen, lines, arrows, rectangles, circles, text notes, color palette, stroke widths, undo/redo manager, and PNG export.
+- **Collaborative Code Editor** — Multi-language editor (JavaScript, TypeScript, Python, HTML, JSON, SQL) with dark/light themes, line numbers, copy-to-clipboard, and a sandboxed JavaScript code execution console.
+- **Live Ephemeral Cursors** — Real-time cursor coordinates and typing indicators rendered for all active participants without persistent database overhead.
+- **Sync Status & Offline Recovery** — Real-time indicator ("Saved to cloud", "Syncing...", "Offline - X queued"). Queues local document updates during network drops and deterministically merges changes on reconnect using Yjs.
+- **Version History & Restore** — Create named milestone snapshots and restore previous document states with one click, preserving complete audit provenance.
+
+### 🔐 Roles, Permissions & Security (RBAC)
+- **Role Enforcement** — Three distinct meeting roles:
+  - **Host**: Manage meeting lifecycle, invite participants, update member roles, and end meeting for all.
+  - **Editor**: Full read/write access to shared notes, whiteboard, and code editor.
+  - **Viewer**: Real-time read-only access. Server strictly validates incoming Socket.IO events and blocks viewer updates (`PERMISSION_DENIED`).
+- **Private & Open Meetings** — Hosts can mark rooms as private (accessible only to invited users) or open with configurable default roles.
+- **Secure Socket Handshake** — Socket.IO connections require verified Clerk authentication tokens on handshake. Identity spoofing and client-supplied user IDs are strictly rejected.
+
+### 🎥 Reliable Video & Audio Conferencing
+- **Peer-to-Peer Mesh** — WebRTC-powered low-latency video and audio streams.
+- **ICE Candidate Buffering** — Solves negotiation race conditions (`InvalidStateError`) by queueing early ICE candidates until remote descriptions are set.
+- **Media Permission Fallbacks** — Automatic fallback to audio-only if camera access is denied or hardware is unavailable.
+- **Configurable ICE Strategy** — Configurable STUN/TURN servers via `VITE_ICE_SERVERS`.
+- **In-Meeting Chat** — Real-time persistent messaging with rate limiting and deduplication.
 
 ---
 
@@ -29,22 +40,22 @@ A full-stack, real-time video conferencing application built with **React**, **E
 |---|---|
 | [React 19](https://react.dev) | UI framework |
 | [Vite](https://vite.dev) | Build tool & dev server |
-| [Tailwind CSS 4](https://tailwindcss.com) | Utility-first styling |
-| [React Router 7](https://reactrouter.com) | Client-side routing |
-| [Clerk React](https://clerk.com/docs/quickstarts/react) | Authentication & user management |
+| [Tailwind CSS 4](https://tailwindcss.com) | Modern styling |
+| [Yjs](https://yjs.dev) | CRDT shared document framework |
 | [Socket.IO Client](https://socket.io) | Real-time WebSocket communication |
-| [Axios](https://axios-http.com) | HTTP client |
-| [Lucide React](https://lucide.dev) | Icon library |
+| [Clerk React](https://clerk.com) | Authentication & user session management |
+| [Lucide React](https://lucide.dev) | Icon set |
 | [React Hot Toast](https://react-hot-toast.com) | Toast notifications |
 
 ### Server
 | Technology | Purpose |
 |---|---|
+| [Node.js 20+](https://nodejs.org) | Runtime environment |
 | [Express 5](https://expressjs.com) | HTTP server framework |
-| [Socket.IO](https://socket.io) | WebSocket server for real-time events |
-| [Clerk Express](https://clerk.com/docs/quickstarts/express) | Authentication middleware & webhooks |
-| [Neon Serverless](https://neon.tech) | Serverless PostgreSQL database |
-| [dotenv](https://www.npmjs.com/package/dotenv) | Environment variable management |
+| [Socket.IO 4](https://socket.io) | WebSocket server with Clerk auth middleware & rate limits |
+| [Yjs](https://yjs.dev) | Server-side CRDT state vector diffing and snapshot merging |
+| [Neon Serverless](https://neon.tech) | PostgreSQL database with connection pooling |
+| [Clerk Express](https://clerk.com) | JWT verification & webhook handling |
 
 ---
 
@@ -53,47 +64,47 @@ A full-stack, real-time video conferencing application built with **React**, **E
 ```
 meetup/
 ├── client/                     # React frontend (Vite)
-│   ├── public/                 # Static assets
 │   ├── src/
-│   │   ├── assets/             # Static data & assets
 │   │   ├── components/
-│   │   │   ├── meeting/        # Meeting room components (VideoGrid, ChatPanel, ControlBar, etc.)
-│   │   │   ├── sessions/       # Session history components
-│   │   │   ├── Navbar.jsx      # Navigation bar
-│   │   │   ├── Footer.jsx      # Footer
-│   │   │   ├── Loader.jsx      # Loading spinner
-│   │   │   ├── ProtectedRoute.jsx
-│   │   │   └── Protectedlayout.jsx
-│   │   ├── config/             # API client config
-│   │   ├── hooks/              # Custom hooks (useWebRTC, useChat)
+│   │   │   ├── meeting/        # VideoGrid, ChatPanel, ControlBar, ParticipantList
+│   │   │   ├── workspace/      # WorkspaceContainer, NotesEditor, Whiteboard, CodeEditor,
+│   │   │   │                   # LiveCursors, SyncStatusBadge, VersionHistoryModal, InviteMemberModal
+│   │   │   ├── sessions/       # Meeting session history components
+│   │   │   └── Navbar.jsx      # Navigation bar
+│   │   ├── hooks/
+│   │   │   ├── useWebRTC.js    # WebRTC mesh hook with ICE queueing
+│   │   │   ├── useWorkspace.js # Yjs CRDT synchronization & offline recovery
+│   │   │   └── useChat.js      # In-meeting chat hook
 │   │   ├── pages/
-│   │   │   ├── Dashboard.jsx   # Home — create/join meetings
-│   │   │   ├── MeetingRoom.jsx # Active meeting room with video/chat
-│   │   │   ├── Sessions.jsx    # Past meeting history
-│   │   │   ├── Pricing.jsx     # Clerk PricingTable
-│   │   │   └── Login.jsx       # Sign in / Sign up
-│   │   ├── App.jsx             # Route definitions
-│   │   ├── main.jsx            # Entry point with ClerkProvider
-│   │   └── index.css           # Global styles
-│   ├── .env                    # Client environment variables
-│   ├── package.json
-│   └── vite.config.js
-│
-├── server/                     # Express backend
-│   ├── config/
-│   │   └── db.js               # Neon DB connection & table initialization
-│   ├── controllers/
-│   │   ├── meetingController.js # Meeting CRUD & stats
-│   │   └── webhookController.js# Clerk webhook handler
-│   ├── middleware/
-│   │   └── auth.js             # Auth middleware with user auto-provisioning
-│   ├── routes/
-│   │   └── meetingRoutes.js    # Meeting API routes
-│   ├── socket.js               # Socket.IO event handlers (WebRTC signaling, chat)
-│   ├── server.js               # Express app entry point
-│   ├── .env                    # Server environment variables
+│   │   │   ├── Dashboard.jsx   # Create/join meeting dashboard
+│   │   │   ├── MeetingRoom.jsx # Active room: Video Grid + Collaborative Workspace
+│   │   │   ├── Sessions.jsx    # Session history & transcripts
+│   │   │   └── Pricing.jsx     # Subscription plans
+│   │   └── config/socket.js    # Socket.IO client with auth handshake
 │   └── package.json
 │
+├── server/                     # Express & Socket.IO backend
+│   ├── config/
+│   │   └── db.js               # Database schema initialization & migrations
+│   ├── controllers/
+│   │   ├── meetingController.js# Meeting CRUD, RBAC, workspace & versioning APIs
+│   │   └── webhookController.js# Clerk webhooks
+│   ├── middleware/
+│   │   └── auth.js             # HTTP auth & Socket.IO handshake token verification
+│   ├── routes/
+│   │   └── meetingRoutes.js    # REST endpoints
+│   ├── services/
+│   │   └── workspaceService.js # CRDT sync, persistence, snapshot compaction & metrics
+│   ├── socket.js               # Real-time WebRTC signaling & collaborative events
+│   ├── tests/
+│   │   ├── concurrency.test.js # Multi-client concurrency & RBAC test suite
+│   │   └── load-simulation.js  # Concurrent multi-room load benchmark
+│   └── server.js               # Entry point & Socket.IO initialization
+│
+├── docs/                       # Technical reports & guides
+│   ├── audit-report.md         # Initial audit & vulnerability report
+│   ├── architecture-and-scaling.md # Scaling roadmap (Redis, sticky sessions)
+│   └── load-test-report.md     # Multi-client load & convergence benchmark
 └── README.md
 ```
 
@@ -102,42 +113,36 @@ meetup/
 ## 🚀 Getting Started
 
 ### Prerequisites
-
-- [Node.js](https://nodejs.org) v20.9.0 or higher
-- A [Clerk](https://clerk.com) account (for authentication)
-- A [Neon](https://neon.tech) database (serverless PostgreSQL)
-- A [Stripe](https://stripe.com) account (optional — for premium subscriptions)
+- **Node.js** v20.9.0 or higher
+- A **Clerk** account ([clerk.com](https://clerk.com))
+- A **Neon** PostgreSQL database ([neon.tech](https://neon.tech))
 
 ### 1. Clone the repository
-
 ```bash
 git clone <your-repo-url>
 cd meetup
 ```
 
-### 2. Set up environment variables
+### 2. Configure Environment Variables
 
 **Server** (`server/.env`):
-
 ```env
 ORIGINS="http://localhost:5173,http://localhost:3000"
-
 DATABASE_URL="postgresql://<user>:<password>@<host>/<database>?sslmode=require"
-
 CLERK_PUBLISHABLE_KEY="pk_test_..."
 CLERK_SECRET_KEY="sk_test_..."
 CLERK_WEBHOOK_SIGNING_SECRET="whsec_..."
 ```
 
 **Client** (`client/.env`):
-
 ```env
 VITE_BASE_URL="http://localhost:3000"
 VITE_CLERK_PUBLISHABLE_KEY="pk_test_..."
+# Optional TURN server config (JSON string):
+# VITE_ICE_SERVERS='[{"urls":"stun:stun.l.google.com:19302"}]'
 ```
 
-### 3. Install dependencies
-
+### 3. Install Dependencies
 ```bash
 # Server
 cd server
@@ -148,104 +153,146 @@ cd ../client
 npm install
 ```
 
-### 4. Set up Clerk webhooks
-
-1. Go to **Clerk Dashboard** → **Configure** → **Webhooks**
-2. Add a new endpoint: `https://<your-server-url>/api/clerk`
-3. Subscribe to events: `user.created`, `user.updated`, `user.deleted`
-4. Copy the **Signing Secret** into `CLERK_WEBHOOK_SIGNING_SECRET` in `server/.env`
-
-> For local development, use [ngrok](https://ngrok.com) to expose your server:
-> ```bash
-> ngrok http 3000
-> ```
-
-### 5. Run the app
-
+### 4. Run Locally
 ```bash
-# Terminal 1 — Server
+# Terminal 1 — Backend Server
 cd server
 npm run server
 
-# Terminal 2 — Client
+# Terminal 2 — Frontend Client
 cd client
 npm run dev
 ```
 
-- **Client**: http://localhost:5173
-- **Server**: http://localhost:3000
+- **Client App**: [http://localhost:5173](http://localhost:5173)
+- **API Server**: [http://localhost:3000](http://localhost:3000)
 
 ---
 
 ## 📡 API Reference
 
-All protected routes require an `Authorization: Bearer <token>` header (Clerk session token).
+All protected endpoints require an `Authorization: Bearer <clerk_token>` header.
 
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `GET` | `/` |✅ | Health check |
-| `POST` | `/api/clerk` |✅  | Clerk webhook receiver |
-| `POST` | `/api/meetings` | ✅ | Create a new meeting |
-| `GET` | `/api/meetings/stats` | ✅ | Get user's plan & meeting stats |
-| `GET` | `/api/meetings/sessions` | ✅ | Get all user's meeting sessions |
-| `GET` | `/api/meetings/sessions/:id` | ✅ | Get session details by meeting ID |
-| `GET` | `/api/meetings/:meetingId` | ✅ | Get a meeting by meeting code |
+### Meeting & Room Management
+| Method | Endpoint | Role Required | Description |
+|---|---|---|---|
+| `POST` | `/api/meetings` | Authenticated | Create a new meeting (supports `isPrivate` & `defaultRole`) |
+| `GET` | `/api/meetings/:meetingId` | Member / Host | Get meeting metadata, verified host, and caller's role |
+| `GET` | `/api/meetings/stats` | Authenticated | Fetch monthly meeting usage and plan limits |
+| `GET` | `/api/meetings/sessions` | Authenticated | Fetch past meeting sessions and transcripts |
 
----
+### Roles & Invitations (RBAC)
+| Method | Endpoint | Role Required | Description |
+|---|---|---|---|
+| `POST` | `/api/meetings/:meetingId/invite` | **Host only** | Invite user by email or ID with `editor` or `viewer` role |
+| `GET` | `/api/meetings/:meetingId/members` | Member / Host | List all members and their assigned roles |
+| `PATCH` | `/api/meetings/:meetingId/members/:targetUserId` | **Host only** | Promote or demote member role |
+| `DELETE` | `/api/meetings/:meetingId/members/:targetUserId` | **Host only** | Remove member from room |
 
-## 🔌 Socket.IO Events
+### Workspace & Version History
+| Method | Endpoint | Role Required | Description |
+|---|---|---|---|
+| `GET` | `/api/meetings/:meetingId/workspace` | Member / Host | Get workspace metadata and last saved timestamp |
+| `GET` | `/api/meetings/:meetingId/workspace/versions` | Member / Host | List version history snapshots for a tool |
+| `POST` | `/api/meetings/:meetingId/workspace/versions` | Editor / Host | Create a named milestone version snapshot |
+| `POST` | `/api/meetings/:meetingId/workspace/versions/:id/restore` | Editor / Host | Restore document to a previous snapshot |
 
-| Event | Direction | Description |
-|-------|-----------|-------------|
-| `join-room` | Client → Server | Join a meeting room |
-| `all-users` | Server → Client | List of existing participants |
-| `user-joined` | Server → Client | New participant joined |
-| `user-left` | Server → Client | Participant disconnected |
-| `offer` | Client ↔ Server | WebRTC SDP offer |
-| `answer` | Client ↔ Server | WebRTC SDP answer |
-| `ice-candidate` | Client ↔ Server | WebRTC ICE candidate |
-| `toggle-audio` | Client → Server | Audio mute/unmute |
-| `toggle-video` | Client → Server | Video on/off |
-| `user-toggled-audio` | Server → Client | Peer audio state changed |
-| `user-toggled-video` | Server → Client | Peer video state changed |
-| `send-message` | Client → Server | Send a chat message |
-| `receive-message` | Server → Client | Receive a chat message |
-| `end-meeting` | Client → Server | Host ends the meeting |
-| `meeting-ended` | Server → Client | Meeting was ended |
+### Observability
+| Method | Endpoint | Role Required | Description |
+|---|---|---|---|
+| `GET` | `/api/meetings/observability/metrics` | Public / Ops | Real-time connection count, latency percentiles (p50/p95/p99) |
 
 ---
 
-## 🗄️ Database Schema
+## 🔌 Socket.IO Real-Time Protocol
 
-The database tables are auto-created on server startup via `initDB()`.
+### Connection Handshake
+Clients connect with authentication credentials:
+```js
+socket = io(SERVER_URL, {
+  auth: { token: "<clerk_session_jwt>" }
+});
+```
+
+### Collaborative Events
+| Event | Direction | Payload | Description |
+|---|---|---|---|
+| `join-room` | Client → Server | `{ roomId, audioEnabled, videoEnabled }` | Join room with server-verified role |
+| `room-joined` | Server → Client | `{ roomId, role, isHost, canEdit, existingUsers }` | Join acknowledgement |
+| `workspace:get-doc` | Client → Server | `{ roomId, docType, stateVector }` | Request document state diff |
+| `workspace:doc-sync`| Server → Client | `{ docType, update, serverTimestamp }` | Synchronize missing document state |
+| `workspace:update`  | Client ↔ Server | `{ docType, opId, update, schemaVersion }` | Incremental CRDT update (deduplicated) |
+| `workspace:presence`| Client ↔ Server | `{ docType, cursor: {x,y}, activeTool }` | Ephemeral live cursor broadcasting |
+| `workspace:error`   | Server → Client | `{ code, message }` | Error (e.g. `PERMISSION_DENIED`) |
+| `send-message`      | Client → Server | `{ roomId, message: { text } }` | Chat message with server-verified author |
+| `receive-message`   | Server → Client | `{ id, text, senderId, senderName, time }` | Broadcasted persistent chat message |
+| `end-meeting`       | Client → Server | `{ roomId }` | Terminate meeting (**Host only**) |
+
+---
+
+## 🗄️ Database Architecture
 
 ```
-┌──────────────┐       ┌──────────────────────┐
-│    users      │       │      meetings         │
-├──────────────┤       ├──────────────────────┤
-│ id (PK)      │◄──────│ host_id (FK)          │
-│ name         │       │ id (PK)               │
-│ email        │       │ meeting_id (unique)    │
-│ image        │       │ title                  │
-│ plan         │       │ status                 │
-│ created_at   │       │ ended_at               │
-│ updated_at   │       │ created_at             │
-└──────┬───────┘       └──────────┬────────────┘
-       │                          │
-       │  ┌───────────────────────┤
-       │  │                       │
-       ▼  ▼                       ▼
-┌─────────────────────┐   ┌──────────────────────┐
-│ meeting_participants │   │  meeting_messages     │
-├─────────────────────┤   ├──────────────────────┤
-│ id (PK)             │   │ id (PK)              │
-│ meeting_id (FK)     │   │ meeting_id (FK)      │
-│ user_id (FK)        │   │ sender_id (FK)       │
-│ name                │   │ sender_name          │
-│ joined_at           │   │ text                 │
-│ left_at             │   │ timestamp            │
-└─────────────────────┘   └──────────────────────┘
+┌──────────────────┐       ┌──────────────────────┐       ┌──────────────────────┐
+│      users       │       │       meetings       │       │   meeting_members    │
+├──────────────────┤       ├──────────────────────┤       ├──────────────────────┤
+│ id (PK)          │◄──────│ host_id (FK)         │◄──────│ meeting_id (FK)      │
+│ name             │       │ id (PK)              │       │ user_id (FK)         │
+│ email (unique)   │       │ meeting_id (unique)  │       │ role (host/ed/vw)    │
+│ plan             │       │ is_private           │       │ joined_at            │
+│ created_at       │       │ default_role         │       └──────────────────────┘
+└────────┬─────────┘       │ status / ended_at    │
+         │                 └──────────┬───────────┘
+         │                            │
+         ▼                            ▼
+┌──────────────────┐       ┌──────────────────────┐       ┌──────────────────────┐
+│  meeting_messages│       │ workspace_snapshots  │       │  workspace_updates   │
+├──────────────────┤       ├──────────────────────┤       ├──────────────────────┤
+│ id (PK)          │       │ id (PK)              │       │ id (PK)              │
+│ meeting_id (FK)  │       │ meeting_id (FK)      │       │ meeting_id (FK)      │
+│ sender_id (FK)   │       │ doc_type             │       │ doc_type             │
+│ text             │       │ snapshot_data        │       │ update_data (base64) │
+│ timestamp        │       │ version_number       │       │ op_id (dedup index)  │
+└──────────────────┘       └──────────────────────┘       │ actor_id (FK)        │
+                                                          └──────────────────────┘
 ```
+
+---
+
+## 🧪 Testing & Verification
+
+MeetUp includes an automated test suite covering concurrency, role permissions, deduplication, and load testing.
+
+### Run Concurrency & RBAC Test Suite
+```bash
+cd server
+$env:NODE_ENV="test"  # Windows PowerShell
+node --test tests/concurrency.test.js
+```
+**Test Coverage:**
+1. Simultaneous typing by multiple users into identical text regions (deterministic convergence).
+2. Viewer role cannot edit (validates server rejection with `PERMISSION_DENIED`).
+3. Duplicate operations (validates `opId` deduplication buffer).
+4. Concurrent whiteboard vector drawing operations.
+5. Private meeting authorization enforcement (uninvited attendees rejected).
+
+### Run Multi-Client Load Simulation
+```bash
+cd server
+node tests/load-simulation.js
+```
+Simulates **12 concurrent clients** across **3 meeting rooms** simultaneously emitting update bursts:
+- **Convergence Verification**: 100% byte-for-byte identical document state across all clients.
+- **End-to-End Latency**: Mean `3 ms`, p95 `5 ms`, p99 `9 ms`.
+- Results are saved to [`docs/load-test-report.md`](docs/load-test-report.md).
+
+---
+
+## 📄 Documentation
+
+- [Audit & Remediation Report](docs/audit-report.md)
+- [Architecture & Horizontal Scaling Guide](docs/architecture-and-scaling.md)
+- [Load & Convergence Benchmark Report](docs/load-test-report.md)
 
 ---
 
