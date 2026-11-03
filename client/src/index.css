@@ -1,38 +1,36 @@
-@import url('https://fonts.googleapis.com/css2?family=Geist+Mono:ital,wght@0,100..900;1,100..900&family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300..800&family=Work+Sans:wght@300..700&family=Geist+Mono:wght@300..600&display=swap');
 @import "tailwindcss";
 
 @theme {
-    --color-primary: #004cff;
-    --color-primary-hover: #0033ad;
-    --color-primary-light: #d9e4ff;
-    --color-primary-border: #7a9cff;
+    /* Soft UI Evolution: calm indigo + success green on a lavender canvas */
+    --color-primary: #4f46e5;
+    --color-primary-hover: #4338ca;
+    --color-primary-light: #ecebff;
+    --color-primary-border: #c7c9fb;
+    --color-canvas: #f6f4ff;
+    --color-ink: #1e1b4b;
+    --color-muted: #5b5a85;
+    --color-line: #e6e3f7;
+    --color-accent: #059669;
+    --font-display: "Outfit", system-ui, sans-serif;
+    --font-sans: "Work Sans", system-ui, sans-serif;
+    --font-mono: "Geist Mono", ui-monospace, monospace;
 }
+
 @layer base {
-    * {
-        font-family: "Urbanist", sans-serif;
-        box-sizing: border-box;
-    }
-
-    body {
-        @apply bg-slate-50 text-slate-900 antialiased min-h-screen selection:bg-primary/20 selection:text-primary-hover;
-    }
+    html { background: #f6f4ff; scroll-behavior: auto; }
+    body { font-family: var(--font-sans); @apply bg-canvas text-ink antialiased min-h-screen selection:bg-primary/20; }
+    h1, h2, h3, .font-display { font-family: var(--font-display); }
+    code, pre, .font-mono { font-family: var(--font-mono); }
+    :focus-visible { outline: 2px solid #4f46e5; outline-offset: 2px; }
 }
 
-/* Custom Scrollbar for Light Mode */
-::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-}
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-thumb { background: #cfcdee; border-radius: 9999px; }
 
-::-webkit-scrollbar-track {
-    background: transparent;
-}
+.soft-card { background: #fff; border: 1px solid var(--color-line); border-radius: 1.5rem; box-shadow: 0 1px 0 #fff inset, 0 24px 50px -28px rgba(79, 70, 229, 0.35); }
+.grain::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .5; background-image: radial-gradient(#d9d6f2 1.2px, transparent 1.2px); background-size: 28px 28px; mask-image: radial-gradient(ellipse at 50% 40%, black 20%, transparent 70%); }
 
-::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 9999px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
-}
+@keyframes marquee { to { transform: translateX(-50%); } }
+.animate-marquee { animation: marquee 34s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .animate-marquee { animation: none; } }

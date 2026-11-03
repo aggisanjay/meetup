@@ -41,74 +41,76 @@ const ControlBar = ({
     };
 
     return (
-        <footer className="w-full bg-white/90 backdrop-blur-md border-t border-slate-200/80 px-4 sm:px-6 py-3.5 flex items-center justify-between z-40 shadow-lg shadow-slate-200/50">
+        <footer className="w-full bg-white/85 backdrop-blur-xl border-t border-line px-4 sm:px-6 py-3 flex items-center justify-between z-40 shadow-[0_-8px_30px_-15px_rgba(79,70,229,0.18)]">
             {/* Left Info / Copy Link */}
             <div className="hidden sm:flex items-center gap-3">
-                <span className="text-xs font-medium text-slate-600 font-mono tracking-wider">Id: {roomId}</span>
+                <span className="text-xs font-medium text-muted font-mono tracking-wider bg-canvas border border-line px-2.5 py-1 rounded-full">
+                    ID: {roomId}
+                </span>
                 <button
                     onClick={copyMeetingId}
-                    className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 hover:text-slate-900 flex items-center gap-1.5 text-xs font-medium cursor-pointer transition-all"
+                    className="px-3 py-1.5 rounded-full bg-white hover:bg-canvas border border-line text-ink text-xs font-semibold shadow-xs flex items-center gap-1.5 cursor-pointer transition-all"
                 >
-                    {copied ? <CheckIcon className="w-3.5 h-3.5 text-emerald-600" /> : <CopyIcon className="w-3.5 h-3.5" />}
+                    {copied ? <CheckIcon className="w-3.5 h-3.5 text-emerald-600" /> : <CopyIcon className="w-3.5 h-3.5 text-muted" />}
                     <span>{copied ? "Copied" : "Copy Link"}</span>
                 </button>
             </div>
 
             {/* Center Controls */}
-            <div className="flex items-center gap-2.5 sm:gap-3 mx-auto sm:mx-0">
+            <div className="flex items-center gap-2 sm:gap-2.5 mx-auto sm:mx-0">
                 {/* Audio Toggle */}
                 <button
                     onClick={onToggleAudio}
-                    className={`p-3 sm:p-3.5 rounded-2xl transition-all cursor-pointer border ${
+                    className={`p-3 rounded-full transition-all cursor-pointer border shadow-xs ${
                         audioEnabled
-                            ? "bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-300 shadow-xs"
-                            : "bg-rose-50 hover:bg-rose-100 text-rose-600 border-rose-200 shadow-xs"
+                            ? "bg-slate-100 hover:bg-slate-200 text-ink border-line"
+                            : "bg-rose-50 hover:bg-rose-100 text-rose-600 border-rose-200 ring-2 ring-rose-200/50"
                     }`}
                     title={audioEnabled ? "Mute Microphone" : "Unmute Microphone"}
                 >
-                    {audioEnabled ? <MicIcon className="w-5 h-5" /> : <MicOffIcon className="w-5 h-5" />}
+                    {audioEnabled ? <MicIcon className="w-4.5 h-4.5" /> : <MicOffIcon className="w-4.5 h-4.5" />}
                 </button>
 
                 {/* Video Toggle */}
                 <button
                     onClick={onToggleVideo}
-                    className={`p-3 sm:p-3.5 rounded-2xl transition-all cursor-pointer border ${
+                    className={`p-3 rounded-full transition-all cursor-pointer border shadow-xs ${
                         videoEnabled
-                            ? "bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-300 shadow-xs"
-                            : "bg-rose-50 hover:bg-rose-100 text-rose-600 border-rose-200 shadow-xs"
+                            ? "bg-slate-100 hover:bg-slate-200 text-ink border-line"
+                            : "bg-rose-50 hover:bg-rose-100 text-rose-600 border-rose-200 ring-2 ring-rose-200/50"
                     }`}
                     title={videoEnabled ? "Turn Off Camera" : "Turn On Camera"}
                 >
-                    {videoEnabled ? <VideoIcon className="w-5 h-5" /> : <VideoOffIcon className="w-5 h-5" />}
+                    {videoEnabled ? <VideoIcon className="w-4.5 h-4.5" /> : <VideoOffIcon className="w-4.5 h-4.5" />}
                 </button>
 
                 {/* Workspace Collaboration Area Toggle */}
                 <button
                     onClick={onToggleWorkspace}
-                    className={`relative p-3 sm:p-3.5 rounded-2xl transition-all cursor-pointer border ${
+                    className={`px-4 py-2.5 rounded-full transition-all cursor-pointer border flex items-center gap-2 ${
                         isWorkspaceOpen
-                            ? "bg-primary text-white border-primary shadow-md shadow-primary/20 ring-2 ring-primary/30"
-                            : "bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-300 shadow-xs"
+                            ? "bg-primary text-white border-primary shadow-md shadow-primary/25 ring-2 ring-primary/30"
+                            : "bg-slate-100 hover:bg-slate-200 text-ink border-line shadow-xs"
                     }`}
                     title="Toggle Collaboration Workspace (Notes, Whiteboard, Code)"
                 >
-                    <LayersIcon className="w-5 h-5" />
-                    <span className="hidden md:inline-block ml-1.5 text-xs font-medium">Workspace</span>
+                    <LayersIcon className="w-4.5 h-4.5" />
+                    <span className="hidden md:inline-block text-xs font-semibold">Workspace</span>
                 </button>
 
                 {/* Chat Toggle */}
                 <button
                     onClick={onToggleChat}
-                    className={`relative p-3 sm:p-3.5 rounded-2xl transition-all cursor-pointer border ${
+                    className={`relative p-3 rounded-full transition-all cursor-pointer border shadow-xs ${
                         isChatOpen
-                            ? "bg-primary text-white border-primary shadow-md shadow-primary/20"
-                            : "bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-300 shadow-xs"
+                            ? "bg-primary text-white border-primary shadow-md shadow-primary/25"
+                            : "bg-slate-100 hover:bg-slate-200 text-ink border-line"
                     }`}
                     title="Toggle In-Meeting Chat"
                 >
-                    <MessageSquareIcon className="w-5 h-5" />
+                    <MessageSquareIcon className="w-4.5 h-4.5" />
                     {unreadCount > 0 && !isChatOpen && (
-                        <span className="absolute -top-1 -right-1 bg-primary text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-xs">
+                        <span className="absolute -top-1 -right-1 bg-primary text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center ring-2 ring-white shadow-xs">
                             {unreadCount}
                         </span>
                     )}
@@ -117,15 +119,15 @@ const ControlBar = ({
                 {/* Participants Toggle */}
                 <button
                     onClick={onToggleParticipants}
-                    className={`relative p-3 sm:p-3.5 rounded-2xl transition-all cursor-pointer border ${
+                    className={`relative p-3 rounded-full transition-all cursor-pointer border shadow-xs ${
                         isParticipantsOpen
-                            ? "bg-primary text-white border-primary shadow-md shadow-primary/20"
-                            : "bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-300 shadow-xs"
+                            ? "bg-primary text-white border-primary shadow-md shadow-primary/25"
+                            : "bg-slate-100 hover:bg-slate-200 text-ink border-line"
                     }`}
                     title="Toggle Participants List"
                 >
-                    <UsersIcon className="w-5 h-5" />
-                    <span className="absolute -top-1 -right-1 bg-slate-200 text-slate-800 text-[10px] font-bold px-1.5 py-0.5 rounded-full border border-slate-300">
+                    <UsersIcon className="w-4.5 h-4.5" />
+                    <span className="absolute -top-1 -right-1 bg-white text-ink text-[10px] font-bold px-1.5 py-0.5 rounded-full border border-line shadow-xs">
                         {participantCount}
                     </span>
                 </button>
@@ -134,26 +136,29 @@ const ControlBar = ({
                 {isHost ? (
                     <button
                         onClick={onEndMeeting}
-                        className="p-3 sm:p-3.5 rounded-2xl bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-500/25 transition-all cursor-pointer border border-red-500 ml-1 sm:ml-2 font-medium text-xs flex items-center gap-1.5"
+                        className="px-4 py-2.5 rounded-full bg-rose-600 hover:bg-rose-700 text-white shadow-md shadow-rose-600/25 transition-all cursor-pointer border border-rose-500 ml-1 sm:ml-2 font-semibold text-xs flex items-center gap-1.5"
                         title="End Meeting for All"
                     >
-                        <PhoneOffIcon className="w-5 h-5" />
+                        <PhoneOffIcon className="w-4.5 h-4.5" />
                         <span className="hidden md:inline">End Meeting</span>
                     </button>
                 ) : (
                     <button
                         onClick={onLeave}
-                        className="p-3 sm:p-3.5 rounded-2xl bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-500/25 transition-all cursor-pointer border border-red-500 ml-1 sm:ml-2"
+                        className="px-4 py-2.5 rounded-full bg-rose-600 hover:bg-rose-700 text-white shadow-md shadow-rose-600/25 transition-all cursor-pointer border border-rose-500 ml-1 sm:ml-2 font-semibold text-xs flex items-center gap-1.5"
                         title="Leave Meeting"
                     >
-                        <PhoneOffIcon className="w-5 h-5" />
+                        <PhoneOffIcon className="w-4.5 h-4.5" />
+                        <span className="hidden md:inline">Leave</span>
                     </button>
                 )}
             </div>
 
-            {/* Right placeholder */}
-            <div className="hidden sm:block w-32 text-right">
-                <span className="text-xs font-semibold text-slate-400">MeetUp 2.0 Workspace</span>
+            {/* Right branding */}
+            <div className="hidden sm:block text-right">
+                <span className="text-xs font-semibold text-muted font-display">
+                    MeetUp<span className="text-primary">.</span> Workspace
+                </span>
             </div>
         </footer>
     );

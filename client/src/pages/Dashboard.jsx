@@ -1,3 +1,4 @@
+import { Reveal, Tilt3D, Words } from '../components/ui/motion'
 import React, { useEffect, useState } from 'react'
 import {ArrowRightIcon, KeyboardIcon, PlusIcon, ShieldCheckIcon} from "lucide-react"
 import {useNavigate} from 'react-router-dom'
@@ -84,7 +85,7 @@ const Dashboard = () => {
     <div className='flex-1 max-w-7xl w-full mx-auto p-6 md:p-12 flex flex-col justify-center'>
       <div className='grid grid-cols-1 lg:grid-cols-12 gap-12 items-center'>
         {/* Left Column - Actions */}
-        <div className='lg:col-span-7 space-y-8'>
+        <Reveal className='lg:col-span-7'><div className='space-y-8'>
 
           <div className='space-y-3'>
             <div className='inline-flex items-center gap-2 px-3.5 pr-6 py-2 rounded-full bg-white/25 text-xs font-medium'>
@@ -125,10 +126,10 @@ const Dashboard = () => {
             </div>
           </div>
 
-        </div>
+        </div></Reveal>
 
         {/* Right Column - Hero Graphic & Clock Card */}
-        <div className='lg:col-span-5 flex flex-col items-center justify-center space-y-4'>
+        <Reveal className='lg:col-span-5' delay={0.2}><Tilt3D max={5}><div className='flex flex-col items-center justify-center space-y-4'>
           <div className='w-full bg-white/25 backdrop-blur rounded-4xl p-8 border border-slate-200 text-center space-y-6 relative overflow-hidden'>
             <div className='space-y-1'>
               <p className='mb-5 text-xl text-left'>Hi, <span className='font-medium'>{userName}</span></p>
@@ -170,7 +171,7 @@ const Dashboard = () => {
                 )}
             </div>
           </div>
-        </div>
+        </div></Tilt3D></Reveal>
       </div>
 
     </div>

@@ -24,15 +24,49 @@ export const protect = async (req, res, next) => {
     try {
         const userActivePlan = auth.has && auth.has({ plan: "premium" }) ? "premium" : "free";
 
-        const users = await sql`SELECT name, plan FROM users WHERE id = ${userId}`;
-        const userPlan = users[0]?.plan;
+        let users = await sql`SELECT name, plan FROM users WHERE id = ${userId}`;
 
-        if (users.length > 0 && userActivePlan !== userPlan) {
-            await sql`UPDATE users SET plan = ${userActivePlan} WHERE id = ${userId}`;
-        }
-        if (users.length > 0) {
+        if (users.length === 0) {
+            // User authenticated with Clerk but not yet in PostgreSQL DB (e.g. dev environment without webhooks)
+            try {
+                const clerkUser = await clerkClient.users.getUser(userId);
+                const name = `${clerkUser.firstName || "User"} ${clerkUser.lastName || ""}`.trim();
+                const email = clerkUser.emailAddresses?.[0]?.emailAddress || `${userId}@placeholder.com`;
+                const image = clerkUser.imageUrl || "";
+
+                const [newUser] = await sql`
+                    INSERT INTO users (id, name, email, image, plan)
+                    VALUES (${userId}, ${name}, ${email}, ${image}, ${userActivePlan})
+                    ON CONFLICT (id) DO UPDATE SET
+                        name = EXCLUDED.name,
+                        email = COALESCE(NULLIF(EXCLUDED.email, ''), users.email),
+                        image = EXCLUDED.image,
+                        plan = EXCLUDED.plan,
+                        updated_at = NOW()
+                    RETURNING name, plan
+                `;
+                req.user.name = newUser?.name || name;
+                req.user.plan = newUser?.plan || userActivePlan;
+            } catch (clerkErr) {
+                console.error("Failed to fetch Clerk user details in protect middleware:", clerkErr);
+                const [fallbackUser] = await sql`
+                    INSERT INTO users (id, name, email, plan)
+                    VALUES (${userId}, 'User', ${userId + "@placeholder.com"}, ${userActivePlan})
+                    ON CONFLICT (id) DO NOTHING
+                    RETURNING name, plan
+                `;
+                req.user.name = fallbackUser?.name || "User";
+                req.user.plan = fallbackUser?.plan || userActivePlan;
+            }
+        } else {
+            const userPlan = users[0]?.plan;
+            if (userActivePlan !== userPlan) {
+                await sql`UPDATE users SET plan = ${userActivePlan} WHERE id = ${userId}`;
+                req.user.plan = userActivePlan;
+            } else {
+                req.user.plan = userPlan || "free";
+            }
             req.user.name = users[0].name;
-            req.user.plan = userPlan || "free";
         }
     } catch (err) {
         console.error("Auth middleware error checking plan:", err);
@@ -103,4 +137,4 @@ export async function authenticateSocketToken(token) {
     } catch (err) {
         throw new Error(`Socket authentication failed: ${err.message}`);
     }
-}
+}

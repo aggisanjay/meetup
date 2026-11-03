@@ -19,8 +19,18 @@ export const createMeeting = async (req, res) => {
         const { title, isPrivate = false, defaultRole = "editor" } = req.body;
         const userId = req.user.id;
 
-        // Fetch user details & plan
-        const users = await sql`SELECT name, plan FROM users WHERE id = ${userId}`;
+        // Fetch user details & plan (auto-provision in DB if missing to satisfy foreign key constraint)
+        let users = await sql`SELECT name, plan FROM users WHERE id = ${userId}`;
+        if (!users || users.length === 0) {
+            const hostName = req.user.name || "Host";
+            const placeholderEmail = userId + "@placeholder.com";
+            await sql`
+                INSERT INTO users (id, name, email, plan)
+                VALUES (${userId}, ${hostName}, ${placeholderEmail}, 'free')
+                ON CONFLICT (id) DO NOTHING
+            `;
+            users = await sql`SELECT name, plan FROM users WHERE id = ${userId}`;
+        }
         const userPlan = users[0]?.plan || "free";
 
         // check meetings limit per calendar month

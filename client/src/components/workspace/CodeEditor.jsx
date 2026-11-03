@@ -167,11 +167,11 @@ const CodeEditor = ({ ydoc, canEdit = true, onPresenceUpdate, remotePresences })
 
     return (
         <div className={`h-full flex flex-col rounded-2xl border overflow-hidden shadow-xs relative ${
-            isDark ? "bg-slate-950 border-slate-800 text-slate-100" : "bg-white border-slate-200 text-slate-900"
+            isDark ? "bg-[#0c0f1d] border-slate-800 text-[#EEF1FA]" : "bg-white border-line text-ink"
         }`}>
             {/* Top Editor Toolbar */}
             <div className={`px-4 py-2 border-b flex items-center justify-between flex-wrap gap-2 z-10 ${
-                isDark ? "bg-slate-900 border-slate-800" : "bg-slate-50 border-slate-200"
+                isDark ? "bg-[#141829] border-slate-800 text-slate-200" : "bg-slate-50/90 border-line text-ink"
             }`}>
                 <div className="flex items-center gap-2">
                     {/* Language Select */}
@@ -181,8 +181,8 @@ const CodeEditor = ({ ydoc, canEdit = true, onPresenceUpdate, remotePresences })
                         disabled={!canEdit}
                         className={`text-xs font-semibold px-2.5 py-1.5 rounded-lg border outline-none cursor-pointer transition-colors ${
                             isDark
-                                ? "bg-slate-800 border-slate-700 text-slate-200 focus:border-primary"
-                                : "bg-white border-slate-300 text-slate-800 focus:border-primary"
+                                ? "bg-[#1E2747] border-slate-700 text-[#E4E8F5] focus:border-primary"
+                                : "bg-white border-line text-ink focus:border-primary"
                         }`}
                     >
                         {LANGUAGES.map((l) => (
@@ -195,8 +195,8 @@ const CodeEditor = ({ ydoc, canEdit = true, onPresenceUpdate, remotePresences })
                     {/* Theme Toggle */}
                     <button
                         onClick={() => setTheme(isDark ? "light" : "dark")}
-                        className={`text-xs font-medium px-2 py-1.5 rounded-lg border transition-colors cursor-pointer ${
-                            isDark ? "bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700" : "bg-white border-slate-300 text-slate-700 hover:bg-slate-100"
+                        className={`text-xs font-semibold px-2.5 py-1.5 rounded-lg border transition-colors cursor-pointer ${
+                            isDark ? "bg-[#1E2747] border-slate-700 text-slate-300 hover:bg-slate-700" : "bg-white border-line text-slate-700 hover:bg-slate-100 shadow-xs"
                         }`}
                     >
                         {isDark ? "🌙 Dark" : "☀️ Light"}
@@ -214,7 +214,7 @@ const CodeEditor = ({ ydoc, canEdit = true, onPresenceUpdate, remotePresences })
                     {/* Run Code */}
                     <button
                         onClick={runCode}
-                        className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
+                        className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-xs transition-all cursor-pointer"
                         title="Execute Code in Safe Sandbox"
                     >
                         <PlayIcon className="w-3.5 h-3.5 fill-current" />
@@ -224,8 +224,8 @@ const CodeEditor = ({ ydoc, canEdit = true, onPresenceUpdate, remotePresences })
                     {/* Copy Code */}
                     <button
                         onClick={copyCode}
-                        className={`p-1.5 rounded-lg border text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer ${
-                            isDark ? "bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-300" : "bg-white hover:bg-slate-100 border-slate-300 text-slate-700"
+                        className={`p-1.5 px-2.5 rounded-lg border text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer ${
+                            isDark ? "bg-[#1E2747] hover:bg-slate-700 border-slate-700 text-slate-300" : "bg-white hover:bg-slate-100 border-line text-slate-700 shadow-xs"
                         }`}
                         title="Copy Code"
                     >
@@ -239,7 +239,7 @@ const CodeEditor = ({ ydoc, canEdit = true, onPresenceUpdate, remotePresences })
             <div className="flex-1 flex overflow-hidden font-mono text-sm leading-6 relative">
                 {/* Gutter / Line Numbers */}
                 <div className={`w-12 select-none py-4 text-right pr-3 shrink-0 overflow-hidden font-mono text-xs ${
-                    isDark ? "bg-slate-900/60 text-slate-600 border-r border-slate-800/80" : "bg-slate-50 text-slate-400 border-r border-slate-200"
+                    isDark ? "bg-[#141829]/60 text-slate-500 border-r border-slate-800/80" : "bg-slate-50 text-slate-400 border-r border-line"
                 }`}>
                     {lineNumbers.map((num) => (
                         <div key={num}>{num}</div>
@@ -253,8 +253,8 @@ const CodeEditor = ({ ydoc, canEdit = true, onPresenceUpdate, remotePresences })
                     onChange={handleCodeChange}
                     disabled={!canEdit}
                     spellCheck={false}
-                    className={`flex-1 w-full h-full p-4 resize-none outline-none border-none leading-6 font-mono text-sm bg-transparent placeholder-slate-500 ${
-                        isDark ? "text-slate-100 selection:bg-indigo-900/80" : "text-slate-900 selection:bg-blue-100"
+                    className={`flex-1 w-full h-full p-4 resize-none outline-none border-none leading-6 font-mono text-sm bg-transparent ${
+                        isDark ? "text-[#EEF1FA] selection:bg-indigo-900/80 placeholder-slate-500" : "text-ink selection:bg-primary/20 placeholder-slate-400"
                     }`}
                     placeholder={canEdit ? "Write code collaboratively with all attendees..." : "Read-only view."}
                 />
@@ -263,7 +263,7 @@ const CodeEditor = ({ ydoc, canEdit = true, onPresenceUpdate, remotePresences })
             {/* Console Output Drawer */}
             {isConsoleOpen && (
                 <div className={`h-44 border-t flex flex-col z-20 transition-all ${
-                    isDark ? "bg-slate-900 border-slate-800" : "bg-slate-100 border-slate-200"
+                    isDark ? "bg-[#141829] border-slate-800 text-slate-200" : "bg-slate-50 border-line text-ink"
                 }`}>
                     <div className="px-4 py-1.5 border-b border-inherit flex items-center justify-between text-xs font-semibold">
                         <div className="flex items-center gap-1.5">
@@ -273,14 +273,14 @@ const CodeEditor = ({ ydoc, canEdit = true, onPresenceUpdate, remotePresences })
                         <div className="flex items-center gap-1">
                             <button
                                 onClick={() => setOutput([])}
-                                className="p-1 rounded hover:bg-slate-800/40 text-slate-400 hover:text-slate-200 cursor-pointer"
+                                className="p-1 rounded hover:bg-[#1E2747]/40 text-[#7F8AAB] hover:text-[#E4E8F5] cursor-pointer"
                                 title="Clear Console"
                             >
                                 <Trash2Icon className="w-3.5 h-3.5" />
                             </button>
                             <button
                                 onClick={() => setIsConsoleOpen(false)}
-                                className="p-1 rounded hover:bg-slate-800/40 text-slate-400 hover:text-slate-200 cursor-pointer"
+                                className="p-1 rounded hover:bg-[#1E2747]/40 text-[#7F8AAB] hover:text-[#E4E8F5] cursor-pointer"
                                 title="Hide Console"
                             >
                                 <ChevronDownIcon className="w-3.5 h-3.5" />
@@ -289,7 +289,7 @@ const CodeEditor = ({ ydoc, canEdit = true, onPresenceUpdate, remotePresences })
                     </div>
                     <div className="flex-1 p-3 overflow-y-auto font-mono text-xs space-y-1">
                         {output.length === 0 ? (
-                            <span className="text-slate-500 italic">No output. Press "Run Code" to execute.</span>
+                            <span className="text-[#8E9AB8] italic">No output. Press "Run Code" to execute.</span>
                         ) : (
                             output.map((out, idx) => (
                                 <div

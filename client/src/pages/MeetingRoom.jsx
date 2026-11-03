@@ -135,27 +135,32 @@ const MeetingRoom = () => {
     }
 
     return (
-        <div className="h-screen w-screen bg-slate-950 text-slate-100 flex flex-col overflow-hidden relative font-sans">
+        <div className="h-screen w-screen bg-canvas text-ink flex flex-col overflow-hidden relative font-sans selection:bg-primary/20">
+            {/* Ambient mesh background */}
+            <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(ellipse_at_85%_0%,rgba(165,180,252,0.30),transparent_50%),radial-gradient(ellipse_at_0%_100%,rgba(167,243,208,0.22),transparent_50%)]" />
+
             {/* Top Bar with Verified Meeting Title & Real Host */}
-            <header className="w-full bg-slate-900/90 backdrop-blur-md px-4 sm:px-6 py-2.5 border-b border-slate-800 flex items-center justify-between z-30 shadow-xs">
+            <header className="w-full bg-white/80 backdrop-blur-xl px-4 sm:px-6 py-2.5 border-b border-line flex items-center justify-between z-30 shadow-xs">
                 <div className="flex items-center gap-3">
                     <div className="flex items-center gap-2">
-                        <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-                        <h2 className="text-sm sm:text-base font-semibold text-white tracking-tight flex items-center gap-2">
+                        <span className="size-2.5 rounded-full bg-emerald-500 animate-pulse ring-4 ring-emerald-500/20" />
+                        <h2 className="text-sm sm:text-base font-semibold text-ink font-display tracking-tight flex items-center gap-2">
                             {meeting?.title || "Collaborative Meeting"}
                         </h2>
                     </div>
 
-                    <span className="text-xs text-slate-400 font-mono hidden sm:inline-block">({meetingId})</span>
+                    <span className="text-xs text-muted font-mono bg-canvas border border-line px-2 py-0.5 rounded-md hidden sm:inline-block">
+                        {meetingId}
+                    </span>
 
                     {/* Host badge */}
-                    <div className="hidden md:flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-slate-800 border border-slate-700 text-xs text-slate-300">
-                        <CrownIcon className="w-3 h-3 text-amber-400" />
+                    <div className="hidden md:flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200/80 text-xs font-medium text-amber-800">
+                        <CrownIcon className="w-3 h-3 text-amber-500" />
                         <span>Host: {meeting?.host?.name || "Host"}</span>
                     </div>
 
                     {/* Role badge */}
-                    <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[11px] font-semibold uppercase">
+                    <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[11px] font-semibold uppercase tracking-wider">
                         <ShieldIcon className="w-3 h-3" />
                         <span>{userRole}</span>
                     </div>
@@ -163,7 +168,7 @@ const MeetingRoom = () => {
 
                 <div className="flex items-center gap-2">
                     {mediaError && (
-                        <span className="text-xs text-amber-400 hidden lg:inline-block bg-amber-950/40 border border-amber-800 px-2.5 py-1 rounded-lg">
+                        <span className="text-xs text-amber-700 hidden lg:inline-block bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full font-medium">
                             ⚠️ {mediaError}
                         </span>
                     )}
@@ -171,7 +176,7 @@ const MeetingRoom = () => {
                     {isWorkspaceOpen && (
                         <button
                             onClick={() => setIsWorkspaceMaximized(!isWorkspaceMaximized)}
-                            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium hidden sm:flex items-center gap-1 border border-slate-700 transition-colors cursor-pointer"
+                            className="px-3 py-1.5 rounded-full bg-white hover:bg-canvas text-ink border border-line text-xs font-semibold shadow-xs hidden sm:flex items-center gap-1.5 transition-colors cursor-pointer"
                             title={isWorkspaceMaximized ? "Restore split layout" : "Maximize workspace"}
                         >
                             {isWorkspaceMaximized ? <Minimize2Icon className="w-3.5 h-3.5" /> : <Maximize2Icon className="w-3.5 h-3.5" />}
@@ -201,7 +206,7 @@ const MeetingRoom = () => {
 
                         {/* Video Grid Side Column when Workspace is Active */}
                         {!isWorkspaceMaximized && (
-                            <div className="h-48 lg:h-full lg:w-2/5 xl:w-1/3 bg-slate-900 border-t lg:border-t-0 lg:border-l border-slate-800 p-2 overflow-y-auto flex items-center justify-center">
+                            <div className="h-52 lg:h-full lg:w-2/5 xl:w-1/3 bg-canvas/40 backdrop-blur-xs border-t lg:border-t-0 lg:border-l border-line p-3 overflow-y-auto flex items-center justify-center">
                                 <VideoGrid
                                     localStream={localStream}
                                     localUser={userdata}
@@ -214,7 +219,7 @@ const MeetingRoom = () => {
                     </div>
                 ) : (
                     /* Full Screen Video Grid when Workspace is Closed */
-                    <div className="flex-1 flex overflow-hidden relative">
+                    <div className="flex-1 flex overflow-hidden relative p-4">
                         <VideoGrid
                             localStream={localStream}
                             localUser={userdata}

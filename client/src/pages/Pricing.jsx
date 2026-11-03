@@ -1,17 +1,16 @@
 import React from 'react'
-import {PricingTable} from "@clerk/react"
+import { PricingTable } from '@clerk/react'
+import { Words, Reveal, Eyebrow } from '../components/ui/motion'
 
-const Pricing = () => {
-  return (
-    <div className='max-w-4xl mx-auto w-full min-h-[calc(100vh-7rem)] flex flex-col gap-5 items justify-center p-8'>
-      <div className='mb-8'>
-        <h1 className='text-3xl font-medium tracking-tight text-slate-900'>Upgrade your plan.</h1>
-        <p className='text-sm text-slate-500 mt-1'>Choose the plan that's right for you and unlock all the features of MeetUp.</p>
-      </div>
-
-      <PricingTable />
+const Pricing = () => (
+  <div className="relative mx-auto flex min-h-[calc(100vh-7rem)] w-full max-w-4xl flex-col justify-center gap-5 p-8">
+    <div className="mb-6 text-center">
+      <Eyebrow>PLANS</Eyebrow>
+      <h1 className="font-display text-6xl font-semibold leading-[1] tracking-[-0.04em] text-ink"><Words text="Upgrade your plan." inView={false} /></h1>
+      <p className="mt-3 text-muted">Choose the plan that fits and unlock everything in MeetUp.</p>
     </div>
-  )
-}
+    <Reveal><PricingTable /></Reveal>
+  </div>
+)
 
 export default Pricing
