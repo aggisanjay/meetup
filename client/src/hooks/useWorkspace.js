@@ -6,6 +6,32 @@ import toast from "react-hot-toast";
 
 const OFFLINE_STORAGE_PREFIX = "meetup_workspace_offline_";
 
+// Browser-safe base64 encoding and decoding for CRDT Uint8Array payloads
+const uint8ToBase64 = (uint8) => {
+    if (typeof Buffer !== "undefined") {
+        return Buffer.from(uint8).toString("base64");
+    }
+    const CHUNK_SIZE = 8192;
+    let binary = "";
+    for (let i = 0; i < uint8.length; i += CHUNK_SIZE) {
+        binary += String.fromCharCode.apply(null, uint8.subarray(i, i + CHUNK_SIZE));
+    }
+    return btoa(binary);
+};
+
+const base64ToUint8 = (base64) => {
+    if (typeof Buffer !== "undefined") {
+        return new Uint8Array(Buffer.from(base64, "base64"));
+    }
+    const binary = atob(base64);
+    const len = binary.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+        bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes;
+};
+
 export const useWorkspace = (roomId, user, canEdit = true, token = null) => {
     // Current active tool: 'notes' | 'whiteboard' | 'code'
     const [activeTool, setActiveTool] = useState("notes");
@@ -96,7 +122,7 @@ export const useWorkspace = (roomId, user, canEdit = true, token = null) => {
             return;
         }
 
-        const updateBase64 = Buffer.from(updateUint8).toString("base64");
+        const updateBase64 = uint8ToBase64(updateUint8);
         const opId = `op_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
         const payload = {
@@ -141,7 +167,7 @@ export const useWorkspace = (roomId, user, canEdit = true, token = null) => {
 
         const doc = ydocsRef.current[docType];
         const stateVector = Y.encodeStateVector(doc);
-        const stateVectorBase64 = Buffer.from(stateVector).toString("base64");
+        const stateVectorBase64 = uint8ToBase64(stateVector);
 
         socket.emit("workspace:get-doc", {
             roomId,
@@ -149,7 +175,7 @@ export const useWorkspace = (roomId, user, canEdit = true, token = null) => {
             stateVector: stateVectorBase64,
         }, (res) => {
             if (res?.status === "ok" && res.data?.update) {
-                const binary = new Uint8Array(Buffer.from(res.data.update, "base64"));
+                const binary = base64ToUint8(res.data.update);
                 Y.applyUpdate(doc, binary, "server");
                 setSyncStatus("saved");
                 setLastSavedTime(new Date());
@@ -180,7 +206,7 @@ export const useWorkspace = (roomId, user, canEdit = true, token = null) => {
             if (!update) return;
             const doc = docs[docType || "notes"];
             if (doc) {
-                const binary = new Uint8Array(Buffer.from(update, "base64"));
+                const binary = base64ToUint8(update);
                 Y.applyUpdate(doc, binary, "remote");
                 setLastSavedTime(new Date());
             }
@@ -191,7 +217,7 @@ export const useWorkspace = (roomId, user, canEdit = true, token = null) => {
             if (!update) return;
             const doc = docs[docType || "notes"];
             if (doc) {
-                const binary = new Uint8Array(Buffer.from(update, "base64"));
+                const binary = base64ToUint8(update);
                 Y.applyUpdate(doc, binary, "server");
                 setSyncStatus("saved");
             }
